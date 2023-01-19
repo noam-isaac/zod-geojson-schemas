@@ -18,16 +18,21 @@ const GEOJSON_TYPES = [
   'Point',
   'GeoJSON',
 ];
+const BUILD_DIR = path.join(__dirname, '../generated');
 
 const cleanUp = async () => {
   try {
-    await promisify(fs.rm)(path.join(__dirname, '../dist'), {
+    await promisify(fs.rm)(BUILD_DIR, {
       recursive: true,
+      force: true,
     });
-  } catch {}
-  await promisify(fs.mkdir)(path.join(__dirname, '../dist'), {
-    recursive: true,
-  });
+  } catch (err) {
+    console.log(err);
+  }
+  await promisify(fs.mkdir)(BUILD_DIR),
+    {
+      recursive: true,
+    };
 };
 
 const getGeoJsonSchemas = async () => {
@@ -44,7 +49,7 @@ const createZodSchema = async () => {
 
   geoJsonSchemas.map((schema) =>
     promisify(fs.writeFile)(
-      path.join(__dirname, '../dist/' + schema.name + '.ts'),
+      path.join(BUILD_DIR, schema.name + '.ts'),
       jsonSchemaToZod(schema.json, schema.name)
     )
   );
