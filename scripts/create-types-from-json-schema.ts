@@ -1,6 +1,5 @@
 import path from 'path';
-import { promisify } from 'util';
-import fs from 'fs';
+import fs from 'fs/promises';
 
 import { jsonSchemaToZod } from 'json-schema-to-zod';
 
@@ -22,14 +21,14 @@ const BUILD_DIR = path.join(__dirname, '../generated');
 
 const cleanUp = async () => {
   try {
-    await promisify(fs.rm)(BUILD_DIR, {
+    await fs.rm(BUILD_DIR, {
       recursive: true,
       force: true,
     });
   } catch (err) {
     console.log(err);
   }
-  await promisify(fs.mkdir)(BUILD_DIR),
+  await fs.mkdir(BUILD_DIR),
     {
       recursive: true,
     };
@@ -48,7 +47,7 @@ const createZodSchema = async () => {
   const geoJsonSchemas = await getGeoJsonSchemas();
 
   geoJsonSchemas.map((schema) =>
-    promisify(fs.writeFile)(
+    fs.writeFile(
       path.join(BUILD_DIR, schema.name + '.ts'),
       jsonSchemaToZod(schema.json, schema.name)
     )
